@@ -1,5 +1,5 @@
 import telebot
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup
 
 
 def get_main_menu_admin():
@@ -25,4 +25,19 @@ def get_main_menu_markup():
     markup.add(InlineKeyboardButton('Правила', callback_data='rules'))
     markup.add(InlineKeyboardButton('Статистика', callback_data='statistics'))
     markup.add(InlineKeyboardButton('Помощь', callback_data='help'))
+    return markup
+
+
+def get_confirm_markup():
+    markup = ReplyKeyboardMarkup()
+    markup.row('Всё верно', 'Отменить создание лота')
+    return markup
+
+
+def get_group_lot_markup(lead):
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton('Учавствовать', callback_data=f'https://t.me/aucccionBot?start={lead.id}'))
+    markup.row(InlineKeyboardButton('Время', callback_data='time'),
+               InlineKeyboardButton('Информация', callback_data='info'))
+
     return markup
