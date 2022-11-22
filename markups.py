@@ -1,5 +1,4 @@
 import telebot
-
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
@@ -17,10 +16,13 @@ def get_lead_menu_users():
                InlineKeyboardButton('200 R', callback_data='bid200'),
                InlineKeyboardButton('300 R', callback_data='bid300'))
 
+    return markup
+
+
 def get_main_menu_markup():
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton('Мои аукционы', callback_data='my_aucc'))
     markup.add(InlineKeyboardButton('Правила', callback_data='rules'))
     markup.add(InlineKeyboardButton('Статистика', callback_data='statistics'))
     markup.add(InlineKeyboardButton('Помощь', callback_data='help'))
-    
+    return markup

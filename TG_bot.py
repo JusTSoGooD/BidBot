@@ -1,48 +1,79 @@
 import telebot
 import markups
-import lead
-
-class tgBot:
-
-
+from lead import Lead
+import datetime
+import os
 
 
+class TgBot:
 
-    def start_bot(self, key):
+    @staticmethod
+    def start_bot(key):
         bot = telebot.TeleBot(key)
         admin_menu = markups.get_main_menu_admin()
         main_menu = markups.get_main_menu_markup()
 
+        path = os.path.abspath(__file__).rpartition('\\')[0]
+        if not os.path.exists(f'{path}\\Photo'):
+            os.mkdir(f'{path}\\Photo')
+
+        if not os.path.exists(f'{path}\\Video'):
+            os.mkdir(f'{path}\\Video')
+
+        def download_lead_photo(message, lead):
+            photo_id = message.photo[2].file_id
+            file_path = bot.get_file(photo_id).file_path
+            file = bot.download_file(file_path)
+            with open(f'{path}\\Photo\\{lead.id}.jpg', 'wb') as code:
+                code.write(file)
+
+        def download_lead_video(message, lead):
+            file_info = bot.get_file(message.video.file_id)
+            downloaded_file = bot.download_file(file_info.file_path)
+            with open(f'{path}\\Video\\{lead.id}.mpg', 'wb') as code:
+                code.write(downloaded_file)
+
         @bot.message_handler(content_types=['text'])
         def start(message):
             if message.text == '/admin':
-                bot.send_message(message.chat.id, "Главное админ меню", reply_markup = admin_menu)
+                bot.send_message(message.chat.id, 'Главное админ меню', reply_markup=admin_menu)
 
             if message.text == '/start':
-                bot.send_message(message.chat.id, 'Привет, я бот аукционов *название канала* Удачных торгов!', reply_markup = main_menu)
-                
-        @bot.message_handler(content_types=['Text'])
-        def handle_text(message):
-            return message.text
+                bot.send_message(message.chat.id, 'Привет, я бот аукционов *название канала* Удачных торгов!',
+                                 reply_markup=main_menu)
 
-        def fill_lead(id):
+        def get_lead_name(user_id, lead):
+            next_step = bot.send_message(user_id, 'Введите имя лота')
+            bot.register_next_step_handler(next_step, get_lead_price, lead)
 
-            mesg = bot.send_message(id, 'введите название лота')
+        def get_lead_price(message, lead):
+            lead.name = message.text
+            next_step = bot.send_message(message.chat.id, 'Введите стартовую цену лота (в долларах)')
+            bot.register_next_step_handler(next_step, get_lead_description, lead)
 
-            bot.register_next_step_handler(mesg, get_lead_name)
+        def get_lead_description(message, lead):
+            lead.price = message.text
+            next_step = bot.send_message(message.chat.id, 'Введите описание лота')
+            bot.register_next_step_handler(next_step, get_lead_photo, lead)
 
-        def get_lead_name(message):
-            mesg = message.text
-            bot.register_next_step_handler(mesg, get_lead_price )
+        def get_lead_photo(message, lead):
+            lead.description = message.text
+            next_step = bot.send_message(message.chat.id, 'Пришлите фотографию лота *в случае отсутствия фото отправьте любой символ*')
+            bot.register_next_step_handler(next_step, get_lead_video, lead)
 
-        def get_lead_price(message):
-            mesg = message.text
-            bot.register_next_step_handler(mesg, get_lead_time)
+        def get_lead_video(message, lead):
+            if message.content_type == 'photo':
+                download_lead_photo(message, lead)
 
-        def get_lead_time(message):
-            mesg = message.text
+            lead.photo = f'{path}\\Photo\\{lead.id}.jpg'
+            next_step = bot.send_message(message.chat.id, 'Пришлите видео с лотом *в случае отсутствия отправьте любой символ*')
+            bot.register_next_step_handler(next_step, finalize_lead, lead)
 
+        def finalize_lead(message, lead):
+            if message.content_type == 'video':
+                download_lead_video(message, lead)
 
+            print("Вроде норм")
 
 
 
@@ -53,11 +84,9 @@ class tgBot:
             bot.answer_callback_query(callback_query_id=call.id, )
             message_id = call.message.chat.id
             data = call.data
-
             if data == 'make_lead':
-                fill_lead(message_id)
-
+                lead = Lead(12)
+                get_lead_name(message_id, lead)
 
         print("Ready")
         bot.infinity_polling()
-
