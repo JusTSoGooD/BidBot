@@ -36,7 +36,7 @@ def get_confirm_markup():
 
 def get_group_lot_markup(lead):
     markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton('Учавствовать', callback_data=f'https://t.me/aucccionBot?start={lead.id}'))
+    markup.add(InlineKeyboardButton('Учавствовать', url=f'https://t.me/aucccionBot?start={lead.id}'))
     markup.row(InlineKeyboardButton('Время', callback_data='time'),
                InlineKeyboardButton('Информация', callback_data='info'))
 

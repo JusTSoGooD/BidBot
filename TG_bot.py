@@ -4,6 +4,7 @@ from lead import Lead
 import datetime
 import os
 from telebot.types import ReplyKeyboardRemove
+import ChannelManager
 
 
 class TgBot:
@@ -95,6 +96,7 @@ class TgBot:
         def finalize_lead(message, lead):
             if message.text == 'Всё верно':
                 bot.send_message(message.chat.id, "Заглушка отправки лота", reply_markup=ReplyKeyboardRemove())
+                ChannelManager.send_lot_to_channel(bot, lead)
             elif message.text == 'Отменить создание лота':
                 bot.send_message(message.chat.id, 'Создание лота отменено', reply_markup=ReplyKeyboardRemove())
             else:

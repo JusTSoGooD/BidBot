@@ -1,3 +1,6 @@
+import string, random
+
+
 class Lead:
     id = None
     name = None
@@ -9,7 +12,8 @@ class Lead:
 
     # TODO:придумать айди для каждого лида
     def __init__(self, id):
-        self.id = id
+        letters = string.ascii_uppercase
+        self.id = ''.join(random.choice(letters) for i in range(12))
 
 
 class LeadManager:
