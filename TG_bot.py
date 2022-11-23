@@ -1,9 +1,12 @@
 import telebot
+
+import ChannelManager
 import markups
 from lead import Lead
 import datetime
 import os
 from telebot.types import ReplyKeyboardRemove
+import database
 
 
 class TgBot:
@@ -14,6 +17,10 @@ class TgBot:
         admin_menu = markups.get_main_menu_admin()
         main_menu = markups.get_main_menu_markup()
         confirm_markup = markups.get_confirm_markup()
+
+        sql_connection = database.sql_connection()
+        cursor = sql_connection.cursor()
+        database.create_table_lots(sql_connection, cursor)
 
         path = os.path.abspath(__file__).rpartition('\\')[0]
         if not os.path.exists(f'{path}\\Photo'):
@@ -37,6 +44,16 @@ class TgBot:
 
         @bot.message_handler(content_types=['text'])
         def start(message):
+
+            lot_id = message.text.replace("/start ", '')
+
+            print(lot_id)
+            if  message.text == "/start " + lot_id:
+                print(lot_id)
+                lead = database.get_lead_from_db(lot_id)
+                ChannelManager.send_lot_to_bot(bot, lead, message)
+
+
             if message.text == '/admin':
                 bot.send_message(message.chat.id, 'Главное админ меню', reply_markup=admin_menu)
 
@@ -94,12 +111,16 @@ class TgBot:
 
         def finalize_lead(message, lead):
             if message.text == 'Всё верно':
+                database.add_info_in_table(lead)
                 bot.send_message(message.chat.id, "Заглушка отправки лота", reply_markup=ReplyKeyboardRemove())
+                ChannelManager.send_lot_to_channel(bot, lead)
+
+
             elif message.text == 'Отменить создание лота':
                 bot.send_message(message.chat.id, 'Создание лота отменено', reply_markup=ReplyKeyboardRemove())
             else:
                 bot.send_message(message.chat.id, "Команда не распознана", reply_markup=ReplyKeyboardRemove())
-                bot.send_message("/admin")
+
 
         @bot.callback_query_handler(func=lambda call: True)
         def query_handler(call):
@@ -108,8 +129,12 @@ class TgBot:
             message_id = call.message.chat.id
             data = call.data
             if data == 'make_lead':
-                lead = Lead(12)
+                lead = Lead()
                 get_lead_name(message_id, lead)
+
+
+
+
 
         print("Ready")
         bot.infinity_polling()
