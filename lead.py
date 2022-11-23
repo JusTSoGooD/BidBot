@@ -1,10 +1,5 @@
 import string, random
-
-<<<<<<< HEAD
-=======
 import database
-
->>>>>>> testBrunch
 
 class Lead:
     id = None
