@@ -1,5 +1,10 @@
 import string, random
 
+<<<<<<< HEAD
+=======
+import database
+
+>>>>>>> testBrunch
 
 class Lead:
     id = None
@@ -10,11 +15,14 @@ class Lead:
     photo = None
     video = None
 
-    # TODO:придумать айди для каждого лида
+
     def __init__(self, id):
         letters = string.ascii_uppercase
         self.id = ''.join(random.choice(letters) for i in range(12))
 
+    def __init__(self):
+        letters = string.ascii_uppercase
+        self.id = ''.join(random.choice(letters) for i in range(12))
 
 class LeadManager:
     leads = []
@@ -22,5 +30,3 @@ class LeadManager:
     def add_lead(self, lead):
         self.leads.append(lead)
 
-    def get_lead(self, id):
-        pass
