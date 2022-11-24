@@ -1,4 +1,3 @@
-import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup
 
 
@@ -11,10 +10,10 @@ def get_main_menu_admin():
 def get_lead_in_bot_markup(lead):
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton('Инфрормация', callback_data='info'))
-    markup.add(InlineKeyboardButton('Время', callback_data='time'+lead.id))
-    markup.row(InlineKeyboardButton('100 R', callback_data='bid100'+lead.id),
-               InlineKeyboardButton('200 R', callback_data='bid200'+lead.id),
-               InlineKeyboardButton('300 R', callback_data='bid300'+lead.id))
+    markup.add(InlineKeyboardButton('Время', callback_data='time' + lead.id))
+    markup.row(InlineKeyboardButton('100 R', callback_data='bid100' + lead.id),
+               InlineKeyboardButton('200 R', callback_data='bid200' + lead.id),
+               InlineKeyboardButton('300 R', callback_data='bid300' + lead.id))
 
     return markup
 
@@ -28,6 +27,12 @@ def get_main_menu_markup():
     return markup
 
 
+def get_back_to_main_menu_markup():
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton('Главное меню', callback_data='fuckgoback'))
+    return markup
+
+
 def get_confirm_markup():
     markup = ReplyKeyboardMarkup()
     markup.row('Всё верно', 'Отменить создание лота')
@@ -36,7 +41,7 @@ def get_confirm_markup():
 
 def get_group_lot_markup(lead):
     markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton('Учавствовать', url=f'https://t.me/aucccionBot?start={lead.id}'))
+    markup.add(InlineKeyboardButton('Участвовать', url=f'https://t.me/aucccionBot?start={lead.id}'))
     markup.row(InlineKeyboardButton('Время', callback_data='time'),
                InlineKeyboardButton('Информация', callback_data='info'))
 

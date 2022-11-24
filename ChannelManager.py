@@ -28,4 +28,3 @@ def send_lot_to_bot(bot, lead, message):
     else:
         bot.send_message(message.chat.id, text,
                          reply_markup=markups.get_lead_in_bot_markup(lead))
-
