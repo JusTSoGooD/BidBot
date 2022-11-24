@@ -3,7 +3,6 @@ import lead
 from sqlite3 import Error
 
 
-
 def sql_connection():
     try:
 
@@ -16,8 +15,9 @@ def sql_connection():
         print(Error)
 
 
-def create_table_lots(connection, cursor):
-
+def create_table_lots():
+    connection = sql_connection()
+    cursor = connection.cursor()
     cursor.execute("""CREATE TABLE IF NOT EXISTS lots(
              ID_LOT TEXT PRIMARY KEY,
              Name TEXT,
@@ -31,6 +31,17 @@ def create_table_lots(connection, cursor):
     print('done')
 
 
+def create_users_table():
+    connection = sql_connection()
+    cursor = connection.cursor()
+    cursor.execute("""CREATE TABLE IF NOT EXISTS users(
+    USER_ID TEXT PRIMARY KEY,
+    USER_LOTS TEXT
+    )""")
+    connection.commit()
+    print('done')
+
+
 def add_info_in_table(lead):
     connection = sql_connection()
     cursor = connection.cursor()
@@ -38,6 +49,7 @@ def add_info_in_table(lead):
                     VALUES ('{lead.id}', '{lead.name}', '{lead.description}', '{lead.price}'); """
     cursor.execute(insert_in_db)
     connection.commit()
+
 
 def get_lead_from_db(id):
     connection = sql_connection()
@@ -53,5 +65,3 @@ def get_lead_from_db(id):
         lot.price = row[3]
 
     return lot
-
-
