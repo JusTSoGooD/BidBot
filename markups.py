@@ -46,3 +46,9 @@ def get_group_lot_markup(lead):
                InlineKeyboardButton('Информация', callback_data='info'))
 
     return markup
+
+def get_time_gap_markup():
+    markup = ReplyKeyboardMarkup()
+    markup.row('2 минуты', '6 часов', '12 часов')
+    markup.row('1 день', '2 дня')
+    return markup

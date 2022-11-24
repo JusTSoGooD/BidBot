@@ -5,6 +5,7 @@ import database
 import os
 
 confirm_markup = markups.get_confirm_markup()
+time_markup = markups.get_time_gap_markup()
 
 path = os.path.abspath(__file__).rpartition('\\')[0]
 if not os.path.exists(f'{path}\\Photo'):
@@ -31,25 +32,37 @@ def download_lead_video(message, lead, bot):
 
 def get_lead_name(user_id, lead, bot):
     next_step = bot.send_message(user_id, 'Введите имя лота')
-    bot.register_next_step_handler(next_step, get_lead_price, lead, bot)
-
-
-def get_lead_price(message, lead, bot):
-    lead.name = message.text
-    next_step = bot.send_message(message.chat.id, 'Введите стартовую цену лота (в долларах)')
     bot.register_next_step_handler(next_step, get_lead_description, lead, bot)
 
 
 def get_lead_description(message, lead, bot):
-    lead.price = message.text
+    lead.name = message.text
     next_step = bot.send_message(message.chat.id, 'Введите описание лота')
+    bot.register_next_step_handler(next_step, get_lead_price, lead, bot)
+
+
+def get_lead_price(message, lead, bot):
+    lead.description = message.text
+    next_step = bot.send_message(message.chat.id, 'Введите стартовую цену лота (в долярах)')
+    bot.register_next_step_handler(next_step, get_end_time, lead, bot)
+
+
+def get_end_time(message, lead, bot):
+    lead.price = message.text
+    next_step = bot.send_message(message.chat.id, 'С помощью кнопок определите время, через которое окончится аукцион',
+                                 reply_markup=time_markup)
     bot.register_next_step_handler(next_step, get_lead_photo, lead, bot)
 
 
 def get_lead_photo(message, lead, bot):
-    lead.description = message.text
+    if message.text == '2 минуты':
+        lead.end_time = 120
+    else:
+        lead.end_time = 1000
+
     next_step = bot.send_message(message.chat.id,
-                                 'Пришлите фотографию лота *в случае отсутствия фото отправьте любой символ*')
+                                 'Пришлите фотографию лота *в случае отсутствия фото отправьте любой символ*',
+                                 reply_markup=ReplyKeyboardRemove())
     bot.register_next_step_handler(next_step, get_lead_video, lead, bot)
 
 
@@ -69,7 +82,7 @@ def confirm_lead(message, lead, bot):
         lead.video = f'{path}\\Video\\{lead.id}.mp4'
 
     bot.send_message(message.chat.id, "Проверьте, правильно ли введена информация по лоту")
-    text = f"Название: {lead.name}\nОписание: {lead.description}\nСтартовая цена: {lead.price}$"
+    text = f"Название: {lead.name}\nОписание: {lead.description}\nВремя окончания: через {lead.end_time} секунд\nСтартовая цена: {lead.price}$"
     if lead.photo is not None:
         next_step = bot.send_photo(message.chat.id, photo=open(lead.photo, 'rb'), caption=text,
                                    reply_markup=confirm_markup)
