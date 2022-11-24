@@ -83,7 +83,8 @@ def confirm_lead(message, lead, bot):
         lead.video = f'{path}\\Video\\{lead.id}.mp4'
 
     bot.send_message(message.chat.id, "Проверьте, правильно ли введена информация по лоту")
-    text = f"Название: {lead.name}\nОписание: {lead.description}\nВремя окончания: через {lead.end_time} секунд\nСтартовая цена: {lead.price}$"
+    text = f"Название: {lead.name}\nОписание: {lead.description}\nВремя окончания: через {lead.end_time} секунд\n" \
+           f"Стартовая цена: {lead.price}$ "
     if lead.photo is not None:
         next_step = bot.send_photo(message.chat.id, photo=open(lead.photo, 'rb'), caption=text,
                                    reply_markup=confirm_markup)

@@ -10,10 +10,10 @@ def get_main_menu_admin():
 def get_lead_in_bot_markup(lead):
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton('Инфрормация', callback_data='info'))
-    markup.add(InlineKeyboardButton('Время', callback_data='time' + lead.id))
-    markup.row(InlineKeyboardButton('100 R', callback_data='bid100' + lead.id),
-               InlineKeyboardButton('200 R', callback_data='bid200' + lead.id),
-               InlineKeyboardButton('300 R', callback_data='bid300' + lead.id))
+    markup.add(InlineKeyboardButton('Время', callback_data='time_' + lead.id))
+    markup.row(InlineKeyboardButton('100 R', callback_data='bid100_' + lead.id),
+               InlineKeyboardButton('200 R', callback_data='bid200_' + lead.id),
+               InlineKeyboardButton('300 R', callback_data='bid300_' + lead.id))
 
     return markup
 

@@ -16,7 +16,9 @@ def sql_connection():
         print(Error)
 
 
-def create_table_lots(connection, cursor):
+def create_table_lots():
+    connection = sql_connection()
+    cursor = connection.cursor()
     cursor.execute("""CREATE TABLE IF NOT EXISTS lots(
              ID_LOT TEXT PRIMARY KEY,
              Name TEXT,
@@ -25,6 +27,17 @@ def create_table_lots(connection, cursor):
              end_time TEXT,
              Winner TEXT)
         """)
+    connection.commit()
+    print('done')
+
+
+def create_users_table():
+    connection = sql_connection()
+    cursor = connection.cursor()
+    cursor.execute("""CREATE TABLE IF NOT EXISTS users(
+    USER_ID TEXT PRIMARY KEY,
+    USER_LOTS TEXT
+    )""")
     connection.commit()
     print('done')
 

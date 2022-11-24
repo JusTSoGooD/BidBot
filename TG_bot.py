@@ -1,3 +1,5 @@
+import re
+
 import telebot
 
 import Time_manager
@@ -17,16 +19,11 @@ class TgBot:
         main_menu = markups.get_main_menu_markup()
         back_to_main_menu_markup = markups.get_back_to_main_menu_markup()
 
-        sql_connection = database.sql_connection()
-        cursor = sql_connection.cursor()
-        database.create_table_lots(sql_connection, cursor)
-
         @bot.message_handler(content_types=['text'])
         def start(message):
 
             lot_id = message.text.replace("/start ", '')
             if message.text == "/start " + lot_id:
-                print(lot_id)
                 lead = database.get_lead_from_db(lot_id)
                 ChannelManager.send_lot_to_bot(bot, lead, message)
 
@@ -40,9 +37,13 @@ class TgBot:
         @bot.callback_query_handler(func=lambda call: True)
         def query_handler(call):
 
+
             chat_id = call.message.chat.id
             data = call.data
             flag = data[0]
+            lot_id = re.search("[A-Z]+", data)
+            lot_id = lot_id[0]
+
             if data == 'make_lead':
                 lead = Lead()
                 Lot_order.get_lead_name(chat_id, lead, bot)
@@ -53,9 +54,9 @@ class TgBot:
 
             if data == 'rules':
                 bot.delete_message(chat_id, call.message.id)
-                bot.send_message(chat_id, '''После окончания торгов,победитель или продавец должены выйти на связь в течении суток‼️
-Победитель обязан выкупить лот в течении ТРЁХ дней,после окончания аукциона 🔥
-И прочие правила. Абоба.''', reply_markup=back_to_main_menu_markup)
+                bot.send_message(chat_id, '''После окончания торгов,победитель или продавец должены выйти на связь в 
+                течении суток‼️ Победитель обязан выкупить лот в течении ТРЁХ дней,после окончания аукциона 🔥 И 
+                прочие правила. Абоба.''', reply_markup=back_to_main_menu_markup)
 
             if data == 'statistics':
                 bot.delete_message(chat_id, call.message.id)
@@ -64,7 +65,8 @@ class TgBot:
             if data == 'help':
                 bot.delete_message(chat_id, call.message.id)
                 bot.send_message(chat_id,
-                                 'Свяжитесь с нами, если у вас возникли вопросы @JeanS_So_TighT.\n Удачных торгов и выгодных покупок!',
+                                 'Свяжитесь с нами, если у вас возникли вопросы @JeanS_So_TighT.\n Удачных торгов и '
+                                 'выгодных покупок!',
                                  reply_markup=back_to_main_menu_markup)
 
             if data == 'fuckgoback':
@@ -84,6 +86,22 @@ class TgBot:
                     bot.answer_callback_query(call.id, "Аукцион завершен", show_alert=False)
                 else:
                     bot.answer_callback_query(call.id, f"До конца аукциона {end_time}", show_alert=False)
+
+
+            if data == 'bid100_' + lot_id:
+                lot = database.get_lead_from_db(lot_id)
+                lot.price = lot.price + 100
+
+                pass
+            if data == 'bid200_' + lot_id:
+                pass
+            if data == 'bid300_' + lot_id:
+                pass
+            if data == 'time_' + lot_id:
+                pass
+
+
+
 
 
         print("Ready")
