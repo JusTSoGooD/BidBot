@@ -1,7 +1,7 @@
 import sqlite3
 import lead
 from sqlite3 import Error
-
+import Time_manager
 
 
 def sql_connection():
@@ -17,13 +17,11 @@ def sql_connection():
 
 
 def create_table_lots(connection, cursor):
-
     cursor.execute("""CREATE TABLE IF NOT EXISTS lots(
              ID_LOT TEXT PRIMARY KEY,
              Name TEXT,
              Description TEXT, 
              Price TEXT,
-             Start_time TEXT, 
              end_time TEXT,
              Winner TEXT)
         """)
@@ -34,10 +32,12 @@ def create_table_lots(connection, cursor):
 def add_info_in_table(lead):
     connection = sql_connection()
     cursor = connection.cursor()
-    insert_in_db = f"""INSERT INTO lots (ID_LOT, Name, Description, Price) 
-                    VALUES ('{lead.id}', '{lead.name}', '{lead.description}', '{lead.price}'); """
+    lead.end_time = Time_manager.calculate_ending_time(lead.end_time)
+    insert_in_db = f"""INSERT INTO lots (ID_LOT, Name, Description, Price, end_time) 
+                    VALUES ('{lead.id}', '{lead.name}', '{lead.description}', '{lead.price}', '{lead.end_time}'); """
     cursor.execute(insert_in_db)
     connection.commit()
+
 
 def get_lead_from_db(id):
     connection = sql_connection()
@@ -51,7 +51,6 @@ def get_lead_from_db(id):
         lot.name = row[1]
         lot.description = row[2]
         lot.price = row[3]
+        lot.end_time = row[4]
 
     return lot
-
-

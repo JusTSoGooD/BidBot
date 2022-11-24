@@ -3,6 +3,7 @@ from telebot.types import ReplyKeyboardRemove
 import ChannelManager
 import database
 import os
+import time
 
 confirm_markup = markups.get_confirm_markup()
 time_markup = markups.get_time_gap_markup()
@@ -58,7 +59,7 @@ def get_lead_photo(message, lead, bot):
     if message.text == '2 минуты':
         lead.end_time = 120
     else:
-        lead.end_time = 1000
+        lead.end_time = 600
 
     next_step = bot.send_message(message.chat.id,
                                  'Пришлите фотографию лота *в случае отсутствия фото отправьте любой символ*',
@@ -98,9 +99,9 @@ def confirm_lead(message, lead, bot):
 
 def finalize_lead(message, lead, bot):
     if message.text == 'Всё верно':
+        ChannelManager.send_lot_to_channel(bot, lead)
         database.add_info_in_table(lead)
         bot.send_message(message.chat.id, "Лот отправлен", reply_markup=ReplyKeyboardRemove())
-        ChannelManager.send_lot_to_channel(bot, lead)
     elif message.text == 'Отменить создание лота':
         bot.send_message(message.chat.id, 'Создание лота отменено', reply_markup=ReplyKeyboardRemove())
     else:

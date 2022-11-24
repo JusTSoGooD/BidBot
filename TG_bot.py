@@ -1,4 +1,6 @@
 import telebot
+
+import Time_manager
 import markups
 from lead import Lead
 import ChannelManager
@@ -23,8 +25,6 @@ class TgBot:
         def start(message):
 
             lot_id = message.text.replace("/start ", '')
-
-            print(lot_id)
             if message.text == "/start " + lot_id:
                 print(lot_id)
                 lead = database.get_lead_from_db(lot_id)
@@ -40,9 +40,9 @@ class TgBot:
         @bot.callback_query_handler(func=lambda call: True)
         def query_handler(call):
 
-            bot.answer_callback_query(callback_query_id=call.id, )
             chat_id = call.message.chat.id
             data = call.data
+            flag = data[0]
             if data == 'make_lead':
                 lead = Lead()
                 Lot_order.get_lead_name(chat_id, lead, bot)
@@ -71,6 +71,20 @@ class TgBot:
                 bot.delete_message(chat_id, call.message.id)
                 bot.send_message(chat_id, 'Привет, я бот аукционов *название канала* Удачных торгов!',
                                  reply_markup=main_menu)
+
+            if data == 'info':
+                bot.answer_callback_query(call.id,
+                                          text='''Делая ставку участник подтверждает желание и возможность выкупить лот, 
+в случае невыкупа лота участника ебет в жопу грузин!''',
+                                          show_alert=True)
+            if flag == 'T':
+                lead_id = data[1:]
+                end_time = Time_manager.get_time_until_auction_end(lead_id)
+                if end_time is None:
+                    bot.answer_callback_query(call.id, "Аукцион завершен", show_alert=False)
+                else:
+                    bot.answer_callback_query(call.id, f"До конца аукциона {end_time}", show_alert=False)
+
 
         print("Ready")
         bot.infinity_polling()
